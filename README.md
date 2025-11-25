@@ -15,7 +15,44 @@ A powerful domain name availability checker written in Go. This tool helps you f
 
 ![Star History Chart](https://api.star-history.com/svg?repos=xuemian168/domain-scanner&type=Date)
 
+## 🚀 Quick Start
+
+### Web UI Version (Recommended)
+
+Launch the Web UI and database with one command:
+
+```bash
+./start.sh
+```
+
+Or using Docker Compose:
+
+```bash
+docker-compose up -d
+```
+
+Visit http://localhost:8080 to get started!
+
+📖 For detailed deployment documentation, see [DEPLOYMENT.md](DEPLOYMENT.md)
+
+### CLI Command Line Version
+
+```bash
+go run main.go -l 3 -s .li -p D -workers 20
+```
+
 ## Features
+
+### 🌐 Web UI Features (v1.4.0 New)
+- **Graphical Interface**: Beautiful and user-friendly Web interface
+- **Database Storage**: PostgreSQL persistent storage for scan results
+- **Real-time Statistics**: Live domain statistics updates
+- **Search & Filter**: Powerful search and filtering capabilities
+- **Scan History**: View and manage all historical scan sessions
+- **RESTful API**: Complete API endpoints for integration
+- **Docker Deployment**: One-click deployment with Docker Compose
+
+### 🔧 Core Features
 
 - **Dictionary Input Support**: Generate domains from word lists for practical domain checking
   - Read dictionary files (one word per line) for word-based domain generation

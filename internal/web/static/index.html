@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>域名扫描器 - Domain Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            color: #667eea;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+
+        .scan-panel, .results-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .scan-panel h2, .results-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .domain-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .domain-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .domain-item:hover {
+            background: #f9f9f9;
+        }
+
+        .domain-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .domain-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-available {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-registered {
+            background: #ef4444;
+            color: white;
+        }
+
+        .domain-meta {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .session-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .session-status {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-running {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .status-completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 域名扫描器</h1>
+            <p>Domain Scanner - 快速检查域名可用性</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>总域名数</h3>
+                <div class="number" id="stat-total">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>可用域名</h3>
+                <div class="number" id="stat-available">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>已注册域名</h3>
+                <div class="number" id="stat-registered">-</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="scan-panel">
+                <h2>🚀 启动扫描</h2>
+                <form id="scan-form">
+                    <div class="form-group">
+                        <label>域名长度</label>
+                        <input type="number" id="length" value="3" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>域名后缀</label>
+                        <input type="text" id="suffix" value=".li" placeholder=".com">
+                    </div>
+                    <div class="form-group">
+                        <label>域名模式</label>
+                        <select id="pattern">
+                            <option value="D">纯字母 (abc)</option>
+                            <option value="d">纯数字 (123)</option>
+                            <option value="a">字母数字 (a1b)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>正则过滤 (可选)</label>
+                        <input type="text" id="regex" placeholder="^[a-z]{2}[0-9]$">
+                    </div>
+                    <div class="form-group">
+                        <label>查询延迟 (毫秒)</label>
+                        <input type="number" id="delay" value="1000" min="100" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label>工作线程数</label>
+                        <input type="number" id="workers" value="10" min="1" max="50">
+                    </div>
+                    <button type="submit" class="btn" id="scan-btn">开始扫描</button>
+                </form>
+
+                <h2 style="margin-top: 30px;">📊 扫描历史</h2>
+                <div class="session-list" id="session-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+
+            <div class="results-panel">
+                <h2>📋 域名结果</h2>
+
+                <div class="tabs">
+                    <button class="tab active" data-filter="all">全部</button>
+                    <button class="tab" data-filter="available">可用</button>
+                    <button class="tab" data-filter="registered">已注册</button>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜索域名...">
+                </div>
+
+                <div class="domain-list" id="domain-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        加载域名列表...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+        let searchTimeout = null;
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('stat-total').textContent = data.data.total_domains || 0;
+                    document.getElementById('stat-available').textContent = data.data.available_domains || 0;
+                    document.getElementById('stat-registered').textContent = data.data.registered_domains || 0;
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Load domains
+        async function loadDomains(filter = 'all', search = '') {
+            const domainList = document.getElementById('domain-list');
+            domainList.innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+
+            try {
+                let url = '/api/domains?limit=100';
+
+                if (search) {
+                    url = `/api/domains/search?q=${encodeURIComponent(search)}&limit=100`;
+                }
+
+                if (filter === 'available') {
+                    url += '&available=true';
+                } else if (filter === 'registered') {
+                    url += '&available=false';
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.length > 0) {
+                    domainList.innerHTML = data.data.map(domain => `
+                        <div class="domain-item">
+                            <div>
+                                <div class="domain-name">${domain.domain}</div>
+                                <div class="domain-meta">
+                                    ${domain.pattern} | 长度: ${domain.length} | ${new Date(domain.checked_at).toLocaleString('zh-CN')}
+                                    ${domain.signatures && domain.signatures.length > 0 ? '<br>标记: ' + domain.signatures.join(', ') : ''}
+                                </div>
+                            </div>
+                            <span class="domain-badge ${domain.available ? 'badge-available' : 'badge-registered'}">
+                                ${domain.available ? '可用' : '已注册'}
+                            </span>
+                        </div>
+                    `).join('');
+                } else {
+                    domainList.innerHTML = '<div class="empty-state"><div style="font-size: 4em;">📭</div><p>暂无数据</p></div>';
+                }
+            } catch (error) {
+                console.error('Failed to load domains:', error);
+                domainList.innerHTML = '<div class="empty-state"><div style="font-size: 4em;">❌</div><p>加载失败</p></div>';
+            }
+        }
+
+        // Load sessions
+        async function loadSessions() {
+            const sessionList = document.getElementById('session-list');
+
+            try {
+                const response = await fetch('/api/sessions?limit=10');
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.length > 0) {
+                    sessionList.innerHTML = data.data.map(session => `
+                        <div class="session-item">
+                            <div class="session-header">
+                                <strong>Session #${session.id}</strong>
+                                <span class="session-status status-${session.status}">${session.status === 'running' ? '运行中' : '已完成'}</span>
+                            </div>
+                            <div style="font-size: 0.9em; color: #666;">
+                                <div>模式: ${session.pattern} | 长度: ${session.length} | 后缀: ${session.suffix}</div>
+                                <div>总数: ${session.total_domains} | 可用: ${session.available_count} | 已注册: ${session.registered_count}</div>
+                                <div>开始: ${new Date(session.started_at).toLocaleString('zh-CN')}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    sessionList.innerHTML = '<div class="empty-state"><p>暂无扫描历史</p></div>';
+                }
+            } catch (error) {
+                console.error('Failed to load sessions:', error);
+                sessionList.innerHTML = '<div class="empty-state"><p>加载失败</p></div>';
+            }
+        }
+
+        // Handle scan form submission
+        document.getElementById('scan-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('scan-btn');
+            btn.disabled = true;
+            btn.textContent = '扫描中...';
+
+            const scanData = {
+                length: parseInt(document.getElementById('length').value),
+                suffix: document.getElementById('suffix').value,
+                pattern: document.getElementById('pattern').value,
+                regex_filter: document.getElementById('regex').value,
+                delay: parseInt(document.getElementById('delay').value),
+                workers: parseInt(document.getElementById('workers').value),
+            };
+
+            try {
+                const response = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(scanData),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('扫描已启动！请稍后查看结果。');
+                    loadSessions();
+                    // Start auto-refresh
+                    setTimeout(() => {
+                        loadStats();
+                        loadDomains(currentFilter);
+                    }, 5000);
+                } else {
+                    alert('扫描启动失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('扫描启动失败: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '开始扫描';
+            }
+        });
+
+        // Handle tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.filter;
+                loadDomains(currentFilter);
+            });
+        });
+
+        // Handle search
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadDomains(currentFilter, e.target.value);
+            }, 500);
+        });
+
+        // Initial load
+        loadStats();
+        loadDomains();
+        loadSessions();
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadDomains(currentFilter);
+            loadSessions();
+        }, 30000);
+    </script>
+</body>
+</html>
+

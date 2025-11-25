@@ -17,8 +17,44 @@ English | [中文](./README.zh.md)
 
 ![screenshot](./imgs/image.png)
 
+## 🚀 快速开始
+
+### Web UI 版本（推荐）
+
+一键启动 Web UI 和数据库：
+
+```bash
+./start.sh
+```
+
+或使用 Docker Compose：
+
+```bash
+docker-compose up -d
+```
+
+访问 http://localhost:8080 开始使用！
+
+📖 详细部署文档请查看 [DEPLOYMENT.md](DEPLOYMENT.md)
+
+### CLI 命令行版本
+
+```bash
+go run main.go -l 3 -s .li -p D -workers 20
+```
+
 ## 功能特点
 
+### 🌐 Web UI 特性（v1.4.0 新增）
+- **图形化界面**：美观易用的 Web 界面
+- **数据库存储**：PostgreSQL 持久化保存扫描结果
+- **实时统计**：域名统计数据实时更新
+- **搜索过滤**：快速搜索和过滤域名结果
+- **扫描历史**：查看所有历史扫描会话
+- **RESTful API**：提供完整的 API 接口
+- **Docker 部署**：一键部署，开箱即用
+
+### 🔧 核心功能
 - **字典输入支持**：从单词列表生成域名，实现实用的域名检查
   - 读取字典文件（每行一个单词）进行基于单词的域名生成
   - 智能模式检测，自动切换字典模式和模式生成
@@ -225,6 +261,16 @@ git push origin feature/your-feature-name
 本项目采用 AGPL-3.0 许可证 - 详情请参阅 [LICENSE](LICENSE) 文件。
 
 ## 最近更新
+
+### v1.4.0 - 2025-11-25
+- **Web UI 界面**：全新的图形化 Web 界面，美观易用
+- **数据库存储**：集成 PostgreSQL 数据库，持久化保存扫描结果
+- **Docker 部署**：提供 Docker Compose 一键部署方案
+- **RESTful API**：完整的 API 接口，支持二次开发
+- **实时统计**：域名统计数据实时更新展示
+- **搜索过滤**：强大的搜索和过滤功能
+- **扫描历史**：查看和管理所有历史扫描会话
+- **自动刷新**：结果自动刷新，实时查看扫描进度
 
 ### v1.3.4 - 2025-09-02
 - **字典输入**：新增 `-dict` 参数，支持从文本文件进行基于单词的域名生成

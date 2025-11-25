@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: domain-scanner-db
+    environment:
+      POSTGRES_DB: domainscanner
+      POSTGRES_USER: scanner
+      POSTGRES_PASSWORD: scanner123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scanner -d domainscanner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scanner-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: domain-scanner-web
+    environment:
+      DATABASE_URL: postgres://scanner:scanner123@postgres:5432/domainscanner?sslmode=disable
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - scanner-network
+
+volumes:
+  postgres_data:
+
+networks:
+  scanner-network:
+    driver: bridge
+

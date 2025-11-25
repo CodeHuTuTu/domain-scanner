@@ -13,6 +13,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.4.0] - 2025-11-25
+
+### Added
+- **Web UI Interface**: Complete graphical web interface for domain scanning
+- **Database Storage**: PostgreSQL integration for persistent storage of scan results
+- **RESTful API**: Full API endpoints for domain management and scanning
+- **Docker Deployment**: Docker Compose configuration for one-click deployment
+- **Real-time Statistics**: Live dashboard showing domain statistics
+- **Search & Filter**: Powerful search and filtering capabilities in web interface
+- **Scan History**: View and manage all historical scan sessions
+- **Auto-refresh**: Automatic data refresh every 30 seconds
+
+### Technical Improvements
+- **Database Layer**: New `internal/database` package with pgx/v5 driver
+- **Web Server**: Gorilla Mux-based HTTP server with CORS support
+- **API Design**: Clean REST API with proper error handling and JSON responses
+- **Docker Support**: Multi-stage Docker build for optimized image size
+- **Session Management**: Track scan sessions with status and statistics
+- **Concurrent Scanning**: Background scan execution without blocking web UI
+
+### Infrastructure
+- Created `cmd/webserver/main.go` as new web server entry point
+- Added `internal/web/server.go` for HTTP server and routing
+- Added `internal/database/database.go` for PostgreSQL operations
+- Added `internal/web/static/index.html` for web UI
+- Added `docker-compose.yml` for container orchestration
+- Added `Dockerfile` with multi-stage build
+- Added `Makefile` for common development tasks
+- Added `start.sh` quick start script
+- Added `DEPLOYMENT.md` deployment documentation
+- Added `.env.example` for configuration template
+
 ## [1.3.4] - 2025-09-02
 
 ### Added
