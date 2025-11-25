@@ -7,7 +7,7 @@ WORKDIR /app
 RUN apk add --no-cache git
 
 # Copy go mod files
-COPY go.mod go.sum ./
+COPY go.mod ./
 RUN go mod download
 
 # Copy source code
@@ -31,4 +31,3 @@ EXPOSE 8080
 
 # Run the application
 CMD ["./webserver"]
-
